@@ -1,0 +1,2 @@
+instabot==0.29.0
+python-dotenv==0.10.1
