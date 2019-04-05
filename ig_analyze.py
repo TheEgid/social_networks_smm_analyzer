@@ -59,7 +59,7 @@ def get_inst_top_commentators(posts_with_comments_list, months=3):
     return [x for x in top_commentators if x[0] is not None]
 
 
-def get_inst_top_varied_posts_commentators(posts_with_comments_list, months=3):
+def get_inst_top_posts_commentators(posts_with_comments_list, months=3):
     commentators_list = [list(set(
         [get_inst_commentators_last_months(comment, months) for comment in
          post_comments])) for post_comments in posts_with_comments_list]
@@ -72,13 +72,14 @@ def get_inst_top_varied_posts_commentators(posts_with_comments_list, months=3):
                   reverse=True)
 
 
-def analyze_instagram(target_instagram_username, bot, inst_post_ids_file,
-                      inst_comments_file):
-    post_ids_list = get_inst_post_ids(target_instagram_username, bot,
-                                      inst_post_ids_file)
-    inst_comments_list = get_all_inst_comments(post_ids_list, bot,
-                                               inst_comments_file)
-    
-    top_commentators = get_inst_top_commentators(inst_comments_list)
-    top_varied_posts_commentators = get_inst_top_varied_posts_commentators(inst_comments_list)
-    return top_commentators, top_varied_posts_commentators
+# def analyze_instagram(target_instagram_username, bot, inst_post_ids_file,
+#                       inst_comments_file):
+#     post_ids_list = get_inst_post_ids(target_instagram_username, bot,
+#                                       inst_post_ids_file)
+#     inst_comments_list = get_all_inst_comments(post_ids_list, bot,
+#                                                inst_comments_file)
+#
+#     top_commentators = get_inst_top_commentators(inst_comments_list)
+#     top_varied_posts_commentators = get_inst_top_varied_posts_commentators(inst_comments_list)
+#
+#     return top_commentators, top_varied_posts_commentators
