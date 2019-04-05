@@ -78,15 +78,7 @@ def analyze_instagram(target_instagram_username, bot, inst_post_ids_file,
                                       inst_post_ids_file)
     inst_comments_list = get_all_inst_comments(post_ids_list, bot,
                                                inst_comments_file)
-
-    analysis1 = get_inst_top_commentators(inst_comments_list)
-    analysis2 = get_inst_top_varied_posts_commentators(inst_comments_list)
-    return analysis1, analysis2
-
-
-def print_resunts(result):
-    result1, result2 = result
-    comments_dict = {}
-    'Comments Top'
-    'Posts Top'
-    pass
+    
+    top_commentators = get_inst_top_commentators(inst_comments_list)
+    top_varied_posts_commentators = get_inst_top_varied_posts_commentators(inst_comments_list)
+    return top_commentators, top_varied_posts_commentators
