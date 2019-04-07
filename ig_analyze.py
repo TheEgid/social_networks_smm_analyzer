@@ -71,15 +71,3 @@ def get_inst_top_posts_commentators(posts_with_comments_list, months=3):
     return sorted(top_varied_posts_commentators.items(), key=lambda kv: kv[1],
                   reverse=True)
 
-
-# def analyze_instagram(target_instagram_username, bot, inst_post_ids_file,
-#                       inst_comments_file):
-#     post_ids_list = get_inst_post_ids(target_instagram_username, bot,
-#                                       inst_post_ids_file)
-#     inst_comments_list = get_all_inst_comments(post_ids_list, bot,
-#                                                inst_comments_file)
-#
-#     top_commentators = get_inst_top_commentators(inst_comments_list)
-#     top_varied_posts_commentators = get_inst_top_varied_posts_commentators(inst_comments_list)
-#
-#     return top_commentators, top_varied_posts_commentators

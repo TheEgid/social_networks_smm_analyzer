@@ -2,6 +2,14 @@ import os
 import pickle
 import json
 
+
+def listmerge(lstlst):
+    all = []
+    for lst in lstlst:
+        all.extend(lst)
+    return all
+
+
 def storage_picle_io(in_data, picle_file_pathname):
     """DATA: input/output Picle file."""
     if not os.path.exists(picle_file_pathname):
