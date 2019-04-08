@@ -5,8 +5,7 @@ import json
 
 def listmerge(lstlst):
     all = []
-    for lst in lstlst:
-        all.extend(lst)
+    [all.extend(lst) for lst in lstlst]
     return all
 
 
