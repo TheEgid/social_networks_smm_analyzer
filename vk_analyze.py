@@ -31,7 +31,7 @@ def get_all_vk_posts(uid, token, picle_file_pathname, pages_limit):
 
 def get_vk_comments_raw_from_post_id(uid, token, vk_post_id, pages_limit):
     allpages = 100
-    vk_comments_raw = []
+    vk_comments_raw_list = []
     _url = "https://api.vk.com/method/wall.getComments?v=5.92"
     params = {'access_token': token, 'owner_id': uid, 'count': 100,
               'post_id': vk_post_id, 'extended': 1, 'thread_items_count': 10}
@@ -42,36 +42,36 @@ def get_vk_comments_raw_from_post_id(uid, token, vk_post_id, pages_limit):
             if pages_limit is False:
                 allpages = response.json()['response']['count']
             for rezult in response.json()['response']['items']:
-                vk_comments_raw.append(rezult)
+                vk_comments_raw_list.append(rezult)
             if page_numbers >= allpages:
                 break
         else:
             raise ValueError('response vk error!')
-    return vk_comments_raw
+    return vk_comments_raw_list
 
 
-def get_vk_comments_with_threads(vk_comments_raw):
-    all_comments = []
-    threads = listmerge([x['thread']['items'] for x in \
-                         vk_comments_raw if x['thread']['items']])
-    vk_comments_with_threads_raw = vk_comments_raw + threads
-    for comment in vk_comments_with_threads_raw:
+def add_vk_comments_threads(vk_comments_raw_list):
+    all_comments_list = []
+    threads_list = listmerge([comment['thread']['items'] for comment in \
+                         vk_comments_raw_list if comment['thread']['items']])
+    comments_with_threads_list = vk_comments_raw_list + threads_list
+    for comment in comments_with_threads_list:
         try:
-            all_comments.append({comment['date']: comment['from_id']})
+            all_comments_list.append({comment['date']: comment['from_id']})
         except KeyError:
             pass
-    return all_comments
+    return all_comments_list
 
 
 def get_all_vk_comments(vk_post_ids_list, uid, token, picle_file_pathname, pages_limit):
     all_vk_comments = []
     if not os.path.exists(picle_file_pathname):
         for post_id in vk_post_ids_list:
-            raw = get_vk_comments_raw_from_post_id(vk_post_id=post_id,
+            row_comments = get_vk_comments_raw_from_post_id(vk_post_id=post_id,
                                                    uid=uid, token=token,
                                                    pages_limit=pages_limit)
-            all_comments = get_vk_comments_with_threads(raw)
-            all_vk_comments.append(all_comments)
+            comments_with_threads = add_vk_comments_threads(row_comments)
+            all_vk_comments.append(comments_with_threads)
     all_vk_comments = storage_picle_io(in_data=all_vk_comments,
                                         picle_file_pathname=picle_file_pathname)
     return listmerge(all_vk_comments)
