@@ -43,13 +43,19 @@ def analyze_vkontakte(target, vk_token, pages_limit=True):
                                           picle_file_pathname=vk_comments_file,
                                           pages_limit=pages_limit)
 
-    vk_commentators_last_weeks = [get_vk_comment_author_id_last_weeks(x, weeks=2)\
+    all_vk_commentators_last_weeks = [get_vk_comment_author_id_last_weeks(x, weeks=2)\
         for x in  all_vk_comments if get_vk_comment_author_id_last_weeks(x)]
 
     print(len(all_vk_comments))
-    print(len(list(vk_commentators_last_weeks)))
-
-
+    print(len(list(all_vk_commentators_last_weeks)))
+    vk_commentators_last_weeks = set(all_vk_commentators_last_weeks.remove(target)))
+    print(len(vk_commentators_last_weeks))
+    
+    all_vk_likers_last_weeks = None
+    vk_likers_last_weeks = None
+    #return set.intersection(vk_likers_last_weeks, vk_commentators_last_weeks)
+    
+    
 
 if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -71,9 +77,9 @@ if __name__ == '__main__':
 # comments_top, posts_top = analyze_instagram(target=r'cocacolarus',
 #                                             login=LOGIN_INST,
 #                                             password=PASSWORD_INST)
-# print_results('Comments Top', comments_top)
-# print_results('Posts Top', posts_top)
-
+# print_results('Instagram Comments Top', comments_top)
+# print_results('Instagram Posts Top', posts_top)
+# print ('VK Core Audience', None)
 
 
 
