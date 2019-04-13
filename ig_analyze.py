@@ -48,7 +48,7 @@ def get_inst_commentators_last_months(comment_dict, months):
     if isinstance(comment_dict, dict):
         if datetime.datetime.fromtimestamp(
                 comment_dict['created_time']) >= past_time_point:
-            return comment_dict['author_username']
+            return comment_dict['author_user_id']
 
 
 def get_inst_top_commentators(posts_with_comments_list, months=3):

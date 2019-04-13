@@ -6,14 +6,15 @@ from dotenv import load_dotenv
 import argparse
 import datetime
 from services import print_results
+
 from ig_analyze import get_inst_post_ids
 from ig_analyze import get_inst_top_commentators
 from ig_analyze import get_inst_top_posts_commentators
 from ig_analyze import get_all_inst_comments
 
+from vk_analyze import get_vk_group_id
 from vk_analyze import get_vk_post_ids
-from vk_analyze import get_vk_comments
-from vk_analyze import get_vk_comment_author_id_last_weeks
+from vk_analyze import get_vk_last_weeks_commentators_and_likers_ids
 
 
 def analyze_instagram(target, login, password):
@@ -27,59 +28,59 @@ def analyze_instagram(target, login, password):
                                                inst_comments_file)
     top_commentators = get_inst_top_commentators(inst_comments_list, months=3)
     top_posts_commentators = get_inst_top_posts_commentators(inst_comments_list,
-                                                                    months=3)
+                                                             months=3)
     return top_commentators, top_posts_commentators
 
 
 def analyze_vkontakte(target, vk_token, pages_limit=True):
+    uid_target = get_vk_group_id(vk_token=vk_token, group_name=target)
+
     vk_posts_file = 'all_vk_posts_file.pickle'
-    vk_comments_file = 'all_vk_comments_list.pickle'
-    vk_post_ids_list = (get_vk_post_ids(token=vk_token, uid=target,
-                                picle_file_pathname=vk_posts_file,
-                                pages_limit=False))
+    vk_commentators_file = 'all_vk_ids_list.pickle'
 
-    all_vk_comments = get_vk_comments(vk_post_ids_list=vk_post_ids_list,
-                                          uid=target, token=vk_token,
-                                          picle_file_pathname=vk_comments_file,
-                                          pages_limit=pages_limit)
+    vk_post_ids_list = (get_vk_post_ids(token=vk_token, uid=uid_target,
+                                        picle_file_pathname=vk_posts_file,
+                                        pages_limit=pages_limit))
 
-    all_vk_commentators_last_weeks = [get_vk_comment_author_id_last_weeks(x, weeks=2)\
-        for x in  all_vk_comments if get_vk_comment_author_id_last_weeks(x)]
+    #vk_post_ids_list = [1772281, 1773533]
+    vk_core_audience = get_vk_last_weeks_commentators_and_likers_ids(
+        vk_post_ids_list, uid=uid_target, token=vk_token,
+        picle_file_pathname=vk_commentators_file,
+        pages_limit=pages_limit, weeks=2)
+    return vk_core_audience
 
-    print(len(all_vk_comments))
-    print(len(list(all_vk_commentators_last_weeks)))
-    vk_commentators_last_weeks = set(all_vk_commentators_last_weeks.remove(target)))
-    print(len(vk_commentators_last_weeks))
-    
-    all_vk_likers_last_weeks = None
-    vk_likers_last_weeks = None
-    #return set.intersection(vk_likers_last_weeks, vk_commentators_last_weeks)
-    
-    
 
 if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
     sys.path.insert(0, os.path.split(dir_path)[0])
     load_dotenv()
 
-    TOKEN_VK = os.getenv("TOKEN_VK")
-    uid_vk_target = '-16297716'
-
-    analyze_vkontakte(vk_token=TOKEN_VK, target=uid_vk_target, pages_limit=False)
+    ##FB
 
 
 
 
 
-#!!!!!!!!!!!!!!
-# LOGIN_INST = os.getenv("LOGIN_INST")
-# PASSWORD_INST = os.getenv("PASSWORD_INST")
-# comments_top, posts_top = analyze_instagram(target=r'cocacolarus',
-#                                             login=LOGIN_INST,
-#                                             password=PASSWORD_INST)
-# print_results('Instagram Comments Top', comments_top)
-# print_results('Instagram Posts Top', posts_top)
-# print ('VK Core Audience', None)
+    # TOKEN_VK = os.getenv("TOKEN_VK")
+    # vk_target = 'cocacola'
+    #
+    #
+    # vk_core_audience = analyze_vkontakte(vk_token=TOKEN_VK,
+    #                                      target=vk_target, pages_limit=False)
+    # print({'Vkontakte Core Audience': vk_core_audience})
+    # print(len(vk_core_audience))
+
+
+    # LOGIN_INST = os.getenv("LOGIN_INST")
+    # PASSWORD_INST = os.getenv("PASSWORD_INST")
+    # comments_top, posts_top = analyze_instagram(target=r'cocacolarus',
+    #                                         login=LOGIN_INST,
+    #                                         password=PASSWORD_INST)
+    # print_results('Instagram Comments Top', comments_top)
+    # print_results('Instagram Posts Top', posts_top)
+
+
+
 
 
 
