@@ -15,18 +15,16 @@ def get_vk_post_ids(uid, token, picle_file_pathname, pages_limit):
         for page_numbers in count(start=0, step=100):
             params.update({'offset': page_numbers})
             response = requests.get(_url, params=params)
-            if response.ok:
-                if pages_limit is False:
-                    allpages = response.json()['response']['count']
-                for rezult in response.json()['response']['items']:
-                    vk_post_ids_list.append(rezult)
-                if page_numbers >= allpages:
-                    break
-            else:
-                raise ValueError('response vk error!')
+            response.raise_for_status()
+            if pages_limit is False:
+                allpages = response.json()['response']['count']
+            for rezult in response.json()['response']['items']:
+                vk_post_ids_list.append(rezult)
+            if page_numbers >= allpages:
+                break
     vk_post_ids_list = storage_picle_io(in_data=vk_post_ids_list,
                                         picle_file_pathname=picle_file_pathname)
-    return [x['id'] for x in vk_post_ids_list]
+    return [vk_post['id'] for vk_post in vk_post_ids_list]
 
 
 def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
@@ -38,15 +36,13 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
     for page_numbers in count(start=0, step=100):
         params.update({'offset': page_numbers})
         response = requests.get(_url, params=params)
-        if response.ok:
-            if pages_limit is False:
-                allpages = response.json()['response']['count']
-            for rezult in response.json()['response']['items']:
-                vk_comments.append(rezult)
-            if page_numbers >= allpages:
-                break
-        else:
-            raise ValueError('response vk error!')
+        response.raise_for_status()
+        if pages_limit is False:
+            allpages = response.json()['response']['count']
+        for rezult in response.json()['response']['items']:
+            vk_comments.append(rezult)
+        if page_numbers >= allpages:
+            break
     return add_vk_comments_threads(vk_comments)
 
 
@@ -91,15 +87,13 @@ def get_vk_likers_from_post_id(vk_post_id, uid, token, pages_limit):
     for page_numbers in count(start=0, step=1000):
         params.update({'offset': page_numbers})
         response = requests.get(_url, params=params)
-        if response.ok:
-            if pages_limit is False:
-                allpages = response.json()['response']['count']
-            for rezult in response.json()['response']['items']:
-                vk_likers.append(rezult)
-            if page_numbers >= allpages:
-                break
-        else:
-            raise ValueError('response vk error!')
+        response.raise_for_status()
+        if pages_limit is False:
+            allpages = response.json()['response']['count']
+        for rezult in response.json()['response']['items']:
+            vk_likers.append(rezult)
+        if page_numbers >= allpages:
+            break
     return set(vk_likers)
 
 
@@ -110,10 +104,8 @@ def get_vk_last_weeks_commentators_and_likers_ids(vk_post_ids_list, uid, token,
         for post_id in vk_post_ids_list:
             commentators_set = get_vk_last_weeks_commentators(post_id, uid,
                                                     token, pages_limit, weeks)
-
             likers_set = get_vk_likers_from_post_id(post_id, uid,
                                                     token, pages_limit)
-
             commentators_likers = set.intersection(commentators_set, likers_set)
             vk_ids.append(commentators_likers)
 
@@ -125,9 +117,9 @@ def get_vk_last_weeks_commentators_and_likers_ids(vk_post_ids_list, uid, token,
 def get_vk_group_id(vk_token, group_name):
     params = {'group_ids': group_name, 'access_token': vk_token}
     response = requests.get('https://api.vk.com/method/groups.getById?v=5.95',
-                             params=params).json()
-
-    vk_group_id = -1 * response['response'][0]['id'] #vk group id with minus
+                             params=params)
+    response.raise_for_status()
+    vk_group_id = -1 * response.json()['response'][0]['id'] #vk group id with minus
     return vk_group_id
 
 
