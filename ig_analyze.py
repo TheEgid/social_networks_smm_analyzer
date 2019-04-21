@@ -1,7 +1,7 @@
 import os
-import datetime
 from collections import Counter
 from collections import defaultdict
+from services import filter_last_months
 from services import storage_picle_io
 
 
@@ -40,19 +40,14 @@ def get_all_inst_comments(post_id_list, bot, picle_file_pathname):
     return inst_comments_list
 
 
-def get_inst_commentators_last_months(comment_dict, months):
-    qty_days_in_year, qty_months_in_year = 365, 12
-    now = datetime.datetime.now()
-    past_time_point = now - datetime.timedelta(
-        months * qty_days_in_year / qty_months_in_year)
-    if isinstance(comment_dict, dict):
-        if datetime.datetime.fromtimestamp(
-                comment_dict['created_time']) >= past_time_point:
-            return comment_dict['author_user_id']
+def get_inst_commentator_last_months(comment_dict, months):
+    commentator = filter_last_months(comment_dict, 'created_time', months=months)
+    if commentator is not None:
+        return commentator['author_user_id']
 
 
 def get_inst_top_commentators(posts_with_comments_list, months=3):
-    commentators_list = [get_inst_commentators_last_months(comment, months) for
+    commentators_list = [get_inst_commentator_last_months(comment, months) for
                          post_with_comments in posts_with_comments_list for
                          comment in post_with_comments]
     top_commentators = Counter(commentators_list).most_common()
@@ -61,7 +56,7 @@ def get_inst_top_commentators(posts_with_comments_list, months=3):
 
 def get_inst_top_posts_commentators(posts_with_comments_list, months=3):
     commentators_list = [list(set(
-        [get_inst_commentators_last_months(comment, months) for comment in
+        [get_inst_commentator_last_months(comment, months) for comment in
          post_comments])) for post_comments in posts_with_comments_list]
     top_varied_posts_commentators = defaultdict(int)
     for post_comments in commentators_list:
@@ -70,4 +65,3 @@ def get_inst_top_posts_commentators(posts_with_comments_list, months=3):
                 top_varied_posts_commentators[author] += 1
     return sorted(top_varied_posts_commentators.items(), key=lambda kv: kv[1],
                   reverse=True)
-

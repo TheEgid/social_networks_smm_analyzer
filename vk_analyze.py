@@ -3,7 +3,7 @@ import requests
 import datetime
 from itertools import count
 from services import storage_picle_io
-from services import listmerge
+from services import merge_list
 
 
 def get_vk_post_ids(uid, token, picle_file_pathname, pages_limit):
@@ -13,7 +13,7 @@ def get_vk_post_ids(uid, token, picle_file_pathname, pages_limit):
     params = {'access_token': token, 'owner_id': uid, 'count': 100}
     if not os.path.exists(picle_file_pathname):
         for page_numbers in count(start=0, step=100):
-            params.update({'offset': page_numbers})
+            params['offset'] = page_numbers
             response = requests.get(_url, params=params)
             response.raise_for_status()
             if pages_limit is False:
@@ -34,7 +34,7 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
     params = {'access_token': token, 'owner_id': uid, 'count': 100,
               'post_id': vk_post_id, 'extended': 1, 'thread_items_count': 10}
     for page_numbers in count(start=0, step=100):
-        params.update({'offset': page_numbers})
+        params['offset'] = page_numbers
         response = requests.get(_url, params=params)
         response.raise_for_status()
         if pages_limit is False:
@@ -48,7 +48,7 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
 
 def add_vk_comments_threads(vk_comments_list):
     all_comments_list = []
-    threads_list = listmerge([comment['thread']['items'] for comment in \
+    threads_list = merge_list([comment['thread']['items'] for comment in
                               vk_comments_list if comment['thread']['items']])
     comments_with_threads_list = vk_comments_list + threads_list
     for comment in comments_with_threads_list:
@@ -85,7 +85,7 @@ def get_vk_likers_from_post_id(vk_post_id, uid, token, pages_limit):
     params = {'access_token': token, 'owner_id': uid, 'count': 1000,
             'item_id': vk_post_id, 'type': 'post', 'skip_own': 1}
     for page_numbers in count(start=0, step=1000):
-        params.update({'offset': page_numbers})
+        params['offset'] = page_numbers
         response = requests.get(_url, params=params)
         response.raise_for_status()
         if pages_limit is False:
@@ -111,7 +111,7 @@ def get_vk_last_weeks_commentators_and_likers_ids(vk_post_ids_list, uid, token,
 
     vk_ids = storage_picle_io(in_data=vk_ids,
                                    picle_file_pathname=picle_file_pathname)
-    return set(listmerge(vk_ids))
+    return set(merge_list(vk_ids))
 
 
 def get_vk_group_id(vk_token, group_name):
@@ -119,7 +119,7 @@ def get_vk_group_id(vk_token, group_name):
     response = requests.get('https://api.vk.com/method/groups.getById?v=5.95',
                              params=params)
     response.raise_for_status()
-    vk_group_id = -1 * response.json()['response'][0]['id'] #vk group id with minus
+    vk_group_id = -1 * response.json()['response'][0]['id']  # with "-" (vk.com/dev/wall.post#owner_id)
     return vk_group_id
 
 

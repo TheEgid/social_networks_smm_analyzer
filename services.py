@@ -1,13 +1,38 @@
 import os
 import glob
 import pickle
-import json
+import pytz
+from dateutil import parser
+from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
 
 
-def listmerge(lstlst):
-    all = []
-    [all.extend(lst) for lst in lstlst]
-    return all
+def convert_datetime(_datetime):
+    try:
+        _datetime = datetime.fromtimestamp(_datetime, tz=pytz.utc)
+    except TypeError:
+        _datetime = _datetime
+    if isinstance(_datetime, str):
+        _datetime = parser.parse(_datetime)
+    return _datetime
+
+
+def filter_last_months(_dict, time_marker, months):
+    qty_days_in_year, qty_months_in_year = 365, 12
+    now = datetime.now(timezone.utc)
+    past_time_point = now - timedelta(months * qty_days_in_year //
+                                      qty_months_in_year)
+    if isinstance(_dict, dict):
+        created_time = convert_datetime(_dict[time_marker])
+        if created_time >= past_time_point:
+            return _dict
+
+
+def merge_list(lst_lst):
+    _all = []
+    [_all.extend(lst) for lst in lst_lst]
+    return _all
 
 
 def storage_picle_io(in_data, picle_file_pathname):
@@ -29,11 +54,6 @@ def delete_pickle_files():
                 os.remove(pathname)
     except OSError:
         pass
-
-
-def print_results(results_str_name, results_list):
-    json_results = json.dumps({results_str_name: dict(results_list)})
-    print(json.dumps(json.loads(json_results), indent=4))
 
 
 
