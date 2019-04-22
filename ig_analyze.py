@@ -19,25 +19,25 @@ def get_inst_comments_from_post_id(post_id, bot):
 
 def get_inst_post_ids(username, bot, picle_file_pathname):
     user_id = bot.get_user_id_from_username(username)
-    post_ids_list = []
+    post_ids = []
     if not os.path.exists(picle_file_pathname):
-        post_ids_list = bot.get_total_user_medias(user_id)
+        post_ids = bot.get_total_user_medias(user_id)
 
-    post_ids_list = storage_picle_io(in_data=post_ids_list,
+    post_ids = storage_picle_io(in_data=post_ids,
                                      picle_file_pathname=picle_file_pathname)
-    return post_ids_list
+    return post_ids
 
 
 def get_all_inst_comments(post_id_list, bot, picle_file_pathname):
-    inst_comments_list = []
+    inst_comments = []
     if not os.path.exists(picle_file_pathname):
-        inst_comments_list = [get_inst_comments_from_post_id(x, bot) for x in
+        inst_comments = [get_inst_comments_from_post_id(x, bot) for x in
                               post_id_list]
-        inst_comments_list = list(filter(None, inst_comments_list))
+        inst_comments = [filter(None, inst_comments)]
 
-    inst_comments_list = storage_picle_io(in_data=inst_comments_list,
+    inst_comments = storage_picle_io(in_data=inst_comments,
                                         picle_file_pathname=picle_file_pathname)
-    return inst_comments_list
+    return inst_comments
 
 
 def get_inst_commentator_last_months(comment_dict, months):

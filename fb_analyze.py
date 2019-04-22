@@ -107,8 +107,7 @@ def get_compressed_reactions_dict(reactions):
     for reaction in reactions:
         for id, type in reaction.items():
             reactions_dict[id].append(type)
-    reactions_dict = dict(reactions_dict)
-    return reactions_dict
+    return dict(reactions_dict)
 
 
 def get_fb_get_reaction_last_months(reaction_dict, months=1):

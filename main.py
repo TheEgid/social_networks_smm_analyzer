@@ -48,7 +48,7 @@ def analyze_vkontakte(target, vk_token, weeks=2, pages_limit=True):
         vk_posts, uid=uid_target, token=vk_token,
         picle_file_pathname=vk_commentators_file,
         pages_limit=pages_limit, weeks=weeks)
-    return list(vk_core_audience)
+    return set(vk_core_audience)
 
 
 def analyze_facebook(target, fb_token, months=1):
@@ -69,21 +69,21 @@ def analyze_facebook(target, fb_token, months=1):
 
     fb_respondents = get_all_fb_reactions(fb_posts, token=fb_token,
                                           picle_file_pathname=fb_reactions_file)
-
     return fb_commentators, fb_respondents
 
 
 def get_args_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('instruction',
-                        type=str, help= 'social networks - valid arguments only: instagram, vkontakte, facebook')
+                        type=str,
+                        help='social networks - valid arguments only: instagram, vkontakte, facebook')
     parser.add_argument("test", nargs='?',
                         type=str, help="test mode: argument test")
     return parser
 
 
 def analyze_args_and_get_instruction(args):
-    if args.instruction not in ['instagram', 'vkontakte', 'facebook']:
+    if args.instruction.lower() not in ['instagram', 'vkontakte', 'facebook']:
         exit(f' Error: Bad argument {args.instruction}')
     else:
         logging.info(f' Run {args.instruction} analyzer')
@@ -119,7 +119,6 @@ def main():
         comments_top, posts_top = analyze_instagram(target=TARGET_GROUP_NAME_INST,
                                                     login=LOGIN_INST,
                                                     password=PASSWORD_INST)
-
         print({'Instagram Comments Top': comments_top})
         print({'Instagram Posts Top': posts_top})
 
@@ -131,7 +130,6 @@ def main():
     if instruction == 'facebook':
         fb_core_audience, fb_reactions = analyze_facebook(target=TARGET_GROUP_ID_FB,
                                                           fb_token=TOKEN_FB)
-
         print({'Facebook Core Audience': fb_core_audience})
         print({'Facebook Reactions': fb_reactions})
 
