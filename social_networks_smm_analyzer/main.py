@@ -7,15 +7,15 @@ from dotenv import load_dotenv
 import pprint
 
 from services import filter_last_months
-from ig_analyze import get_inst_post_ids
+from services import test_switch_file
+from ig_analyze import get_inst_posts
+from ig_analyze import get_inst_comments
 from ig_analyze import get_inst_top_commentators
 from ig_analyze import get_inst_top_posts_commentators
-from ig_analyze import get_all_inst_comments
-
 from vk_analyze import get_vk_group_id
-from vk_analyze import get_vk_post_ids
-from vk_analyze import get_vk_last_weeks_commentators_and_likers_ids
-
+from vk_analyze import get_vk_posts
+from vk_analyze import get_all_vk_likers
+from vk_analyze import get_vk_last_weeks_commentators
 from fb_analyze import get_all_fb_posts
 from fb_analyze import get_all_fb_comments
 from fb_analyze import get_fb_commentator_last_months
@@ -27,12 +27,10 @@ from fb_analyze import collect_reactions
 def analyze_instagram(target, login, password, months=3):
     bot = Bot()
     bot.login(username=login, password=password)
-    inst_post_ids_file = 'all_inst_post_ids_list.pickle'
-    inst_comments_file = 'all_inst_comments_list.pickle'
-    inst_posts = get_inst_post_ids(target, bot,
-                                      inst_post_ids_file)
-    inst_comments = get_all_inst_comments(inst_posts, bot,
-                                               inst_comments_file)
+    inst_posts = get_inst_posts(target, bot)
+
+    inst_comments = get_inst_comments(inst_posts, bot)
+
     top_commentators = get_inst_top_commentators(inst_comments, months)
     top_posts_commentators = get_inst_top_posts_commentators(inst_comments,
                                                              months)
@@ -40,20 +38,17 @@ def analyze_instagram(target, login, password, months=3):
 
 
 def analyze_vkontakte(target, vk_token, weeks=2, pages_limit=True):
-    uid_target = get_vk_group_id(vk_token=vk_token, group_name=target)
+    uid_target = get_vk_group_id(token=vk_token, group_name=target)
+    vk_posts = get_vk_posts(token=vk_token, uid=uid_target, pages_limit=pages_limit)
 
-    vk_posts_file = 'all_vk_posts_list.pickle'
-    vk_commentators_file = 'all_vk_ids_list.pickle'
+    vk_last_weeks_commentators = set(get_vk_last_weeks_commentators(vk_posts,
+        uid=uid_target, token=vk_token, pages_limit=pages_limit, weeks=weeks))
 
-    vk_posts = get_vk_post_ids(token=vk_token, uid=uid_target,
-                                       picle_file_pathname=vk_posts_file,
-                                       pages_limit=pages_limit)
+    vk_likers = set(get_all_vk_likers(vk_posts, uid=uid_target, token=vk_token,
+                                  pages_limit=pages_limit))
 
-    vk_core_audience = get_vk_last_weeks_commentators_and_likers_ids(
-        vk_posts, uid=uid_target, token=vk_token,
-        picle_file_pathname=vk_commentators_file,
-        pages_limit=pages_limit, weeks=weeks)
-    return set(vk_core_audience)
+    vk_core_audience = set.intersection(vk_last_weeks_commentators, vk_likers)
+    return set(filter(None, vk_core_audience))
 
 
 def analyze_facebook(target, fb_token, months=1):
@@ -79,6 +74,7 @@ def analyze_facebook(target, fb_token, months=1):
 def get_args_parser():
     formatter_class = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=formatter_class)
+
     parser.add_argument('command', type=str,
                         help='Social networks - valid arguments only: instagram, vkontakte, facebook')
     parser.add_argument('-t', '--test', action='store_true', default=False,
@@ -103,29 +99,29 @@ def main():
 
     args = get_args_parser().parse_args()
     if args.test:
-        logging.info(' Test mode: temp data from json file')
+        logging.info(' Test mode')
+        test_switch_file(True)
     else:
-        logging.info(' Normal mode: delete temp files')
-        #delete_pickle_files()
+        logging.info(' Normal mode')
+        test_switch_file(False)
 
+    if args.command == 'instagram':
+        comments_top, posts_top = analyze_instagram(target=TARGET_GROUP_NAME_INST,
+                                                    login=LOGIN_INST,
+                                                    password=PASSWORD_INST)
+        pprint.pprint({'Instagram Comments Top': comments_top,
+                       'Instagram Posts Top': posts_top})
 
-    # if args.command == 'instagram':
-    #     comments_top, posts_top = analyze_instagram(target=TARGET_GROUP_NAME_INST,
-    #                                                 login=LOGIN_INST,
-    #                                                 password=PASSWORD_INST)
-    #     print({'Instagram Comments Top': comments_top})
-    #     print({'Instagram Posts Top': posts_top})
-    #
-    # if args.command == 'vkontakte':
-    #     vk_core_audience = analyze_vkontakte(target=TARGET_GROUP_NAME_VK,
-    #                                          vk_token=TOKEN_VK, pages_limit=False)
-    #     print({'Vkontakte Core Audience': vk_core_audience})
+    if args.command == 'vkontakte':
+        vk_core_audience = analyze_vkontakte(target=TARGET_GROUP_NAME_VK,
+                                             vk_token=TOKEN_VK, pages_limit=False)
+        pprint.pprint({'Vkontakte Core Audience': vk_core_audience})
 
     if args.command == 'facebook':
         audience, reactions = analyze_facebook(target=TARGET_GROUP_ID_FB,
                                                fb_token=TOKEN_FB)
         pprint.pprint({'Facebook Core Audience': audience,
-                      'Facebook Reactions': reactions})
+                       'Facebook Reactions': reactions})
 
 
 if __name__ == '__main__':

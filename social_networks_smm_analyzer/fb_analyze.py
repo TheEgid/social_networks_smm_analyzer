@@ -5,7 +5,7 @@ from services import merge_list
 from services import filter_last_months
 
 
-@storage_json_io_decorator('all_fb_posts.json')
+@storage_json_io_decorator('test_data', 'all_fb_posts.json')
 def get_all_fb_posts(group_id, token):
     url = f'https://graph.facebook.com/{group_id}/feed'
     params = {'access_token': token, 'v': 3.2}
@@ -19,7 +19,7 @@ def get_all_fb_posts(group_id, token):
         response.raise_for_status()
         if not response.json()['data']:
             break
-    return [{'id': post['id'], 'updated_time': post['updated_time']} for post \
+    return [{'id': post['id'], 'updated_time': post['updated_time']} for post
             in merge_list(fb_data_list)]
 
 
@@ -43,7 +43,7 @@ def get_fb_comments_from_post(post, token):
     return merge_list(fb_comments)
 
 
-@storage_json_io_decorator('all_fb_comments.json')
+@storage_json_io_decorator('test_data', 'all_fb_comments.json')
 def get_all_fb_comments(fb_posts, token):
     fb_comments = [get_fb_comments_from_post(post, token) for post in fb_posts]
     return merge_list([comment for comment in fb_comments if comment])
@@ -80,7 +80,7 @@ def get_fb_reactions_from_post_id(post, token):
     return reactions
 
 
-@storage_json_io_decorator('all_fb_reactions.json')
+@storage_json_io_decorator('test_data', 'all_fb_reactions.json')
 def get_all_fb_reactions(fb_posts, token):
     fb_reactions = []
     for post in fb_posts:

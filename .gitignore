@@ -6,7 +6,8 @@ __pycache__/
 *.checkpoint
 *.env
 *.pickle
+*.json
 *.log
 *.txt
-!text_data/
+!test_data/
 !requirements.txt
