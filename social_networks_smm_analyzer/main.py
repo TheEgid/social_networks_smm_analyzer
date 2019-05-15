@@ -4,6 +4,7 @@ import logging
 import argparse
 from instabot import Bot
 from dotenv import load_dotenv
+from collections import Counter
 import pprint
 
 from services import filter_last_months
@@ -22,7 +23,7 @@ from fb_analyze import get_all_fb_comments
 from fb_analyze import get_fb_commentator_last_months
 from fb_analyze import get_all_fb_reactions
 from fb_analyze import get_compressed_reactions_dict
-from fb_analyze import collect_reactions
+#from fb_analyze import collect_reactions
 
 
 def analyze_instagram(target, login, password, months=3):
@@ -67,8 +68,9 @@ def analyze_facebook(target, fb_token, months=1):
 
     reactions_dict = get_compressed_reactions_dict(last_months_reactions)
 
-    fb_respondents = {_id: collect_reactions(_reactions) for _id, _reactions in
+    fb_respondents = {_id: dict(Counter(_reactions)) for _id, _reactions in 
                       reactions_dict.items()}
+    
     return set(last_months_commentators), fb_respondents
 
 

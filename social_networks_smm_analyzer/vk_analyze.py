@@ -6,8 +6,8 @@ from services import merge_list
 
 
 def get_vk_group_id(token, group_name):
-    params = { 'group_ids': group_name, 'access_token': token }
-    response = requests.get('https://api.vk.com/method/groups.getById?v=5.95',
+    params = { 'group_ids': group_name, 'access_token': token, 'v': 5.95}
+    response = requests.get('https://api.vk.com/method/groups.getById,
                             params=params)
     response.raise_for_status()
     vk_group_id = -1 * response.json()['response'][0]['id']  # with "-" (vk.com/dev/wall.post#owner_id)
@@ -18,8 +18,8 @@ def get_vk_group_id(token, group_name):
 def get_vk_posts(uid, token, pages_limit):
     allpages = 1
     vk_post_ids = []
-    _url = "https://api.vk.com/method/wall.get?v=5.95"
-    params = {'access_token': token, 'owner_id': uid, 'count': 100}
+    _url = "https://api.vk.com/method/wall.get"
+    params = {'access_token': token, 'owner_id': uid, 'v': 5.95, 'count': 100}
     for page_numbers in count(start=0, step=100):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
@@ -49,8 +49,8 @@ def add_vk_comments_threads(vk_comments_list):
 def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
     allpages = 100
     vk_comments = []
-    _url = "https://api.vk.com/method/wall.getComments?v=5.95"
-    params = {'access_token': token, 'owner_id': uid, 'count': 100,
+    _url = "https://api.vk.com/method/wall.getComments"
+    params = {'access_token': token, 'owner_id': uid, 'count': 100, 'v': 5.95,
                'post_id': vk_post_id, 'extended': 1, 'thread_items_count': 10}
     for page_numbers in count(start=0, step=100):
         params['offset'] = page_numbers
@@ -78,8 +78,8 @@ def get_vk_commentator_filtered_last_weeks(comment_dict, weeks):
 def get_vk_likers_from_post_id(post_id, uid, token, pages_limit):
     allpages = 1000
     vk_likers = []
-    _url = "https://api.vk.com/method/likes.getList?v=5.95"
-    params = {'access_token': token, 'owner_id': uid, 'count': 1000,
+    _url = "https://api.vk.com/method/likes.getList"
+    params = {'access_token': token, 'owner_id': uid, 'v': 5.95, 'count': 1000,
                'item_id': post_id, 'type': 'post', 'skip_own': 1}
     for page_numbers in count(start=0, step=1000):
         params['offset'] = page_numbers

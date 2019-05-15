@@ -1,6 +1,7 @@
 import os
 import pytz
 import json
+import itertools
 from pathlib import Path
 from dateutil import parser
 from datetime import datetime
@@ -61,7 +62,5 @@ def filter_last_months(_dict, time_marker, months):
             return _dict
 
 
-def merge_list(lst_lst):
-    _all = []
-    [_all.extend(lst) for lst in lst_lst]
-    return _all
+def merge_list(_lst):
+    return list(itertools.chain.from_iterable(_lst))
