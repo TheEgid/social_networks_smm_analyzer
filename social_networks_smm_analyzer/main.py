@@ -7,9 +7,8 @@ from dotenv import load_dotenv
 from collections import Counter
 import pprint
 
-from services import filter_last_months
-#from services import test_switch
 from services import test_switch_var
+from services import filter_last_months
 from ig_analyze import get_inst_posts
 from ig_analyze import get_inst_comments
 from ig_analyze import get_inst_top_commentators
@@ -23,7 +22,6 @@ from fb_analyze import get_all_fb_comments
 from fb_analyze import get_fb_commentator_last_months
 from fb_analyze import get_all_fb_reactions
 from fb_analyze import get_compressed_reactions_dict
-#from fb_analyze import collect_reactions
 
 
 def analyze_instagram(target, login, password, months=3):
@@ -41,7 +39,8 @@ def analyze_instagram(target, login, password, months=3):
 
 def analyze_vkontakte(target, vk_token, weeks=2, pages_limit=True):
     uid_target = get_vk_group_id(token=vk_token, group_name=target)
-    vk_posts = get_vk_posts(token=vk_token, uid=uid_target, pages_limit=pages_limit)
+    vk_posts = get_vk_posts(token=vk_token, uid=uid_target,
+                            pages_limit=pages_limit)
 
     vk_last_weeks_commentators = set(get_vk_last_weeks_commentators(vk_posts,
         uid=uid_target, token=vk_token, pages_limit=pages_limit, weeks=weeks))
@@ -65,13 +64,13 @@ def analyze_facebook(target, fb_token, months=1):
     last_months_reactions = [filter_last_months(reaction, 'post_time', months)
                              for reaction in all_fb_reactions]
     last_months_reactions = list(filter(None, last_months_reactions))
-
     reactions_dict = get_compressed_reactions_dict(last_months_reactions)
 
-    fb_respondents = {_id: dict(Counter(_reactions)) for _id, _reactions in 
+    fb_respondents = {_id: dict(Counter(_reactions)) for _id, _reactions in
                       reactions_dict.items()}
-    
+
     return set(last_months_commentators), fb_respondents
+
 
 
 def get_args_parser():
@@ -106,10 +105,8 @@ def main():
     if args.test:
         logging.info(' Test mode')
         test_switch_var.append(True)
-        #test_switch(True)
     else:
         logging.info(' Normal mode')
-        #test_switch(False)
 
     if args.command == 'instagram':
         comments_top, posts_top = analyze_instagram(target=target_group_name_inst,

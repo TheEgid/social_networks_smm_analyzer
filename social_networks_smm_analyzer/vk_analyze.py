@@ -1,8 +1,7 @@
 import requests
 import datetime
-from itertools import count
+from itertools import count, chain
 from services import storage_json_io_decorator
-from services import merge_list
 
 
 class VKApiResponseError(Exception):
@@ -12,7 +11,7 @@ class VKApiResponseError(Exception):
 
 def get_vk_group_id(token, group_name):
     params = {'group_ids': group_name, 'access_token': token, 'v': 5.95}
-    response = requests.get('https://api.vk.com/method/groups.getById,
+    response = requests.get('https://api.vk.com/method/groups.getById',
                             params=params)
     if response.json().get('error'):
         _msg = response.json()['error']['error_msg']
@@ -44,12 +43,13 @@ def get_vk_posts(uid, token, pages_limit):
 
 def add_vk_comments_threads(vk_comments_list):
     all_comments_list = []
-    threads_list = merge_list([comment['thread']['items'] for comment in
-                               vk_comments_list if comment['thread']['items']])
+    threads_list = [comment['thread']['items'] for comment in
+                    vk_comments_list if comment['thread']['items']]
+    threads_list = list(chain.from_iterable(threads_list))
     comments_with_threads_list = vk_comments_list + threads_list
     for comment in comments_with_threads_list:
         try:
-            all_comments_list.append({comment['date']: comment['from_id']})
+            all_comments_list.extend([{comment['date']: comment['from_id']}])
         except KeyError:
             pass
     return all_comments_list
@@ -113,14 +113,14 @@ def get_vk_last_weeks_commentators(vk_post_ids, uid, token, pages_limit, weeks):
     for post_id in vk_post_ids:
         vk_comments = get_vk_comments_from_post_id(post_id, uid, token,
                                                    pages_limit)
-        last_weeks_commentators.append([
-            get_vk_commentator_filtered_last_weeks(comment, weeks) for
-            comment in vk_comments])
-    return list(set(merge_list(last_weeks_commentators)))
+        last_weeks_commentators.extend(
+            [get_vk_commentator_filtered_last_weeks(comment, weeks) for
+             comment in vk_comments])
+    return list(set(last_weeks_commentators))
 
 
 @storage_json_io_decorator('test_data', 'all_vk_likers.json')
 def get_all_vk_likers(vk_post_ids, uid, token, pages_limit):
     all_likers = [get_vk_likers_from_post_id(post_id, uid, token, pages_limit)
                   for post_id in vk_post_ids]
-    return list(set(merge_list(all_likers)))
+    return list(set(chain.from_iterable(all_likers)))

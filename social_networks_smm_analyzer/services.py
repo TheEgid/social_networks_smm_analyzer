@@ -1,14 +1,15 @@
 import os
 import pytz
 import json
-import itertools
 from pathlib import Path
 from dateutil import parser
 from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
 
+
 test_switch_var = []
+
 
 def test_switch(mode):
     if mode is True:
@@ -61,6 +62,3 @@ def filter_last_months(_dict, time_marker, months):
         if created_time >= past_time_point:
             return _dict
 
-
-def merge_list(_lst):
-    return list(itertools.chain.from_iterable(_lst))
