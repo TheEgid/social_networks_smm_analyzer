@@ -5,11 +5,18 @@ from services import storage_json_io_decorator
 from services import merge_list
 
 
+class VKApiResponseError(Exception):
+    """Declare special exception."""
+    pass
+
+
 def get_vk_group_id(token, group_name):
-    params = { 'group_ids': group_name, 'access_token': token, 'v': 5.95}
+    params = {'group_ids': group_name, 'access_token': token, 'v': 5.95}
     response = requests.get('https://api.vk.com/method/groups.getById,
                             params=params)
-    response.raise_for_status()
+    if response.json().get('error'):
+        _msg = response.json()['error']['error_msg']
+        raise(VKApiResponseError(_msg))
     vk_group_id = -1 * response.json()['response'][0]['id']  # with "-" (vk.com/dev/wall.post#owner_id)
     return vk_group_id
 
@@ -23,7 +30,9 @@ def get_vk_posts(uid, token, pages_limit):
     for page_numbers in count(start=0, step=100):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
-        response.raise_for_status()
+        if response.json().get('error'):
+            _msg = response.json()['error']['error_msg']
+            raise(VKApiResponseError(_msg))
         if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:
@@ -55,7 +64,9 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
     for page_numbers in count(start=0, step=100):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
-        response.raise_for_status()
+        if response.json().get('error'):
+            _msg = response.json()['error']['error_msg']
+            raise(VKApiResponseError(_msg))
         if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:
@@ -84,7 +95,9 @@ def get_vk_likers_from_post_id(post_id, uid, token, pages_limit):
     for page_numbers in count(start=0, step=1000):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
-        response.raise_for_status()
+        if response.json().get('error'):
+            _msg = response.json()['error']['error_msg']
+            raise(VKApiResponseError(_msg))
         if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:

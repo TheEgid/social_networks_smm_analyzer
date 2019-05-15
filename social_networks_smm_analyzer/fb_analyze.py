@@ -90,20 +90,7 @@ def get_all_fb_reactions(fb_posts, token):
 
 
 def get_compressed_reactions_dict(reactions):
-    reactions = [{reaction.pop('id'): reaction.pop('type')} for
-                             reaction in reactions]
     reactions_dict = defaultdict(list)
     for reaction in reactions:
-        for _id, _type in reaction.items():
-            reactions_dict[_id].append(_type)
+       reactions_dict[reaction['id']].append(reaction['type'])
     return dict(reactions_dict)
-
-
-def collect_reactions(reactions):
-    react_types = {"LIKE": 0, "LOVE": 0, "WOW": 0, "HAHA": 0, "SAD": 0,
-                   "ANGRY": 0}
-    for react_type, _ in react_types.items():
-        for reaction in reactions:
-            if reaction == react_type:
-                react_types[react_type] = react_types.get(react_type) + 1
-    return react_types
