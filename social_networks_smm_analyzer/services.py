@@ -7,16 +7,16 @@ from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
 
+test_switch_var = []
 
-def test_switch_file(mode=True):
-    if mode:
-        with open('test_switch.txt', 'w'):
-            pass
+def test_switch(mode):
+    if mode is True:
+        test_switch_var.append(mode)
     else:
         try:
-            os.remove('test_switch.txt')
-        except OSError:
-            pass
+          test_switch_var.pop()
+        except IndexError:
+          pass
 
 
 def storage_json_io_decorator(storage_folder, storage_file_pathname):
@@ -24,7 +24,7 @@ def storage_json_io_decorator(storage_folder, storage_file_pathname):
     pathname = os.path.join(parent_path, storage_folder, storage_file_pathname)
     def memoize(func):
         def decorate(*args, **kwargs):
-            if os.path.exists('test_switch.txt'):
+            if test_switch_var:
                 try:
                     with open(pathname, 'r', encoding='utf-8') as fl:
                         var_data = json.load(fl)

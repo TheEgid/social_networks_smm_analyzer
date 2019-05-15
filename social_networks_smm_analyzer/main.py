@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 import pprint
 
 from services import filter_last_months
-from services import test_switch_file
+#from services import test_switch
+from services import test_switch_var
 from ig_analyze import get_inst_posts
 from ig_analyze import get_inst_comments
 from ig_analyze import get_inst_top_commentators
@@ -75,8 +76,8 @@ def get_args_parser():
     formatter_class = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=formatter_class)
 
-    parser.add_argument('command', type=str,
-                        help='Social networks - valid arguments only: instagram, vkontakte, facebook')
+    msg = 'Only these arguments are valid: instagram, vkontakte, facebook'
+    parser.add_argument('command', type=str, help=msg)
     parser.add_argument('-t', '--test', action='store_true', default=False,
                         help='Test mode')
     return parser
@@ -88,46 +89,47 @@ def main():
     sys.path.insert(0, os.path.split(dir_path)[0])
     load_dotenv()
 
-    LOGIN_INST = os.getenv("LOGIN_INST")
-    PASSWORD_INST = os.getenv("PASSWORD_INST")
-    TOKEN_FB = os.getenv("TOKEN_FB")
-    TOKEN_VK = os.getenv("TOKEN_VK")
+    login_inst = os.getenv("LOGIN_INST")
+    password_inst = os.getenv("PASSWORD_INST")
+    token_fb = os.getenv("TOKEN_FB")
+    token_vk = os.getenv("TOKEN_VK")
 
-    TARGET_GROUP_NAME_INST = os.getenv("TARGET_GROUP_NAME_INST")
-    TARGET_GROUP_NAME_VK = os.getenv("TARGET_GROUP_NAME_VK")
-    TARGET_GROUP_ID_FB = os.getenv("TARGET_GROUP_ID_FB")
+    target_group_name_inst = os.getenv("TARGET_GROUP_NAME_INST")
+    target_group_name_vk = os.getenv("TARGET_GROUP_NAME_VK")
+    target_group_name_fb = os.getenv("TARGET_GROUP_ID_FB")
 
-    args = get_args_parser().parse_args()
+    parser = get_args_parser()
+    args = parser.parse_args()
+
     if args.test:
         logging.info(' Test mode')
-        test_switch_file(True)
+        test_switch_var.append(True)
+        #test_switch(True)
     else:
         logging.info(' Normal mode')
-        test_switch_file(False)
+        #test_switch(False)
 
     if args.command == 'instagram':
-        comments_top, posts_top = analyze_instagram(target=TARGET_GROUP_NAME_INST,
-                                                    login=LOGIN_INST,
-                                                    password=PASSWORD_INST)
+        comments_top, posts_top = analyze_instagram(target=target_group_name_inst,
+                                                    login=login_inst,
+                                                    password=password_inst)
         pprint.pprint({'Instagram Comments Top': comments_top,
                        'Instagram Posts Top': posts_top})
 
-    if args.command == 'vkontakte':
-        vk_core_audience = analyze_vkontakte(target=TARGET_GROUP_NAME_VK,
-                                             vk_token=TOKEN_VK, pages_limit=False)
+    elif args.command == 'vkontakte':
+        vk_core_audience = analyze_vkontakte(target=target_group_name_vk,
+                                             vk_token=token_vk, pages_limit=False)
         pprint.pprint({'Vkontakte Core Audience': vk_core_audience})
 
-    if args.command == 'facebook':
-        audience, reactions = analyze_facebook(target=TARGET_GROUP_ID_FB,
-                                               fb_token=TOKEN_FB)
+    elif args.command == 'facebook':
+        audience, reactions = analyze_facebook(target=target_group_name_fb,
+                                               fb_token=token_fb)
         pprint.pprint({'Facebook Core Audience': audience,
                        'Facebook Reactions': reactions})
+    else:
+        parser.print_help()
+        parser.error('positional arguments error')
 
 
 if __name__ == '__main__':
     main()
-
-
-
-
-

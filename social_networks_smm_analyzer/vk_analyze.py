@@ -24,7 +24,7 @@ def get_vk_posts(uid, token, pages_limit):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
         response.raise_for_status()
-        if pages_limit is False:
+        if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:
             vk_post_ids.append(rezult)
@@ -56,7 +56,7 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
         response.raise_for_status()
-        if pages_limit is False:
+        if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:
             vk_comments.append(rezult)
@@ -85,7 +85,7 @@ def get_vk_likers_from_post_id(post_id, uid, token, pages_limit):
         params['offset'] = page_numbers
         response = requests.get(_url, params=params)
         response.raise_for_status()
-        if pages_limit is False:
+        if not pages_limit:
             allpages = response.json()['response']['count']
         for rezult in response.json()['response']['items']:
             vk_likers.append(rezult)
