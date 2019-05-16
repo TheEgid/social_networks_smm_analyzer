@@ -37,16 +37,14 @@ def analyze_instagram(target, login, password, months=3):
     return top_commentators, top_posts_commentators
 
 
-def analyze_vkontakte(target, vk_token, weeks=2, pages_limit=True):
+def analyze_vkontakte(target, vk_token, weeks=2):
     uid_target = get_vk_group_id(token=vk_token, group_name=target)
-    vk_posts = get_vk_posts(token=vk_token, uid=uid_target,
-                            pages_limit=pages_limit)
+    vk_posts = get_vk_posts(token=vk_token, uid=uid_target)
 
     vk_last_weeks_commentators = set(get_vk_last_weeks_commentators(vk_posts,
-        uid=uid_target, token=vk_token, pages_limit=pages_limit, weeks=weeks))
+        uid=uid_target, token=vk_token, weeks=weeks))
 
-    vk_likers = set(get_all_vk_likers(vk_posts, uid=uid_target, token=vk_token,
-                                  pages_limit=pages_limit))
+    vk_likers = set(get_all_vk_likers(vk_posts, uid=uid_target, token=vk_token))
 
     vk_core_audience = set.intersection(vk_last_weeks_commentators, vk_likers)
     return set(filter(None, vk_core_audience))
@@ -117,7 +115,7 @@ def main():
 
     elif args.command == 'vkontakte':
         vk_core_audience = analyze_vkontakte(target=target_group_name_vk,
-                                             vk_token=token_vk, pages_limit=False)
+                                             vk_token=token_vk)
         pprint.pprint({'Vkontakte Core Audience': vk_core_audience})
 
     elif args.command == 'facebook':
