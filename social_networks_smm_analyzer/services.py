@@ -11,16 +11,6 @@ from datetime import timedelta
 test_switch_var = []
 
 
-def test_switch(mode):
-    if mode is True:
-        test_switch_var.append(mode)
-    else:
-        try:
-          test_switch_var.pop()
-        except IndexError:
-          pass
-
-
 def storage_json_io_decorator(storage_folder, storage_file_pathname):
     parent_path = Path(os.path.abspath(storage_folder)).parent.parent
     pathname = os.path.join(parent_path, storage_folder, storage_file_pathname)
