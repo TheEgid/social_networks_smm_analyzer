@@ -8,7 +8,7 @@ from datetime import timezone
 from datetime import timedelta
 
 
-test_switch_var = []
+test_switch_var = False
 
 
 def storage_json_io_decorator(storage_folder, storage_file_pathname):

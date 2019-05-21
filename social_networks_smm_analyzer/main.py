@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from collections import Counter
 import pprint
 
-from services import test_switch_var
+import services
 from services import filter_last_months
 from ig_analyze import get_inst_posts
 from ig_analyze import get_inst_comments
@@ -102,7 +102,7 @@ def main():
 
     if args.test:
         logging.info(' Test mode')
-        test_switch_var.append(True)
+        services.test_switch_var = True
     else:
         logging.info(' Normal mode')
 
