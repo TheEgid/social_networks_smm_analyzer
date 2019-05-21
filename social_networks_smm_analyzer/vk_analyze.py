@@ -31,8 +31,8 @@ def get_vk_posts(uid, token, pages_limit=100):
         if response.json().get('error'):
             _msg = response.json()['error']['error_msg']
             raise(VKApiResponseError(_msg))
-        for result in response.json()['response']['items']:
-            vk_post_ids.append(result)
+        for rezult in response.json()['response']['items']:
+            vk_post_ids.append(rezult)
         if page_numbers >= pages_limit:
             break
     return [vk_post['id'] for vk_post in vk_post_ids]
@@ -63,8 +63,8 @@ def get_vk_comments_from_post_id(vk_post_id, uid, token, pages_limit=100):
         if response.json().get('error'):
             _msg = response.json()['error']['error_msg']
             raise(VKApiResponseError(_msg))
-        for result in response.json()['response']['items']:
-            vk_comments.append(result)
+        for rezult in response.json()['response']['items']:
+            vk_comments.append(rezult)
         if page_numbers >= pages_limit:
             break
     all_vk_comments_from_post_id = add_vk_comments_threads(vk_comments)
@@ -92,8 +92,8 @@ def get_vk_likers_from_post_id(post_id, uid, token, pages_limit=1000):
         if response.json().get('error'):
             _msg = response.json()['error']['error_msg']
             raise(VKApiResponseError(_msg))
-        for result in response.json()['response']['items']:
-            vk_likers.append(result)
+        for rezult in response.json()['response']['items']:
+            vk_likers.append(rezult)
         if page_numbers >= pages_limit:
             break
     return set(vk_likers)
